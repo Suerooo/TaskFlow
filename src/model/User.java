@@ -1,6 +1,6 @@
 package model;
 
-import org.mindrot.jbcrypt.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class User {
     // Atributos estaticos
@@ -14,8 +14,9 @@ public class User {
 
     public User(String username, String email, String password) {
         this.ID = ++userCount;
-        this.username = username;
-        this.email = email;
+        setUsername(username);
+        setEmail(email);
+        setPassword(password);
     }
 
     public int getID() {
@@ -53,11 +54,11 @@ public class User {
     public void setPassword(String password) {
         if (password == null || password.trim().isEmpty()) {
             throw new IllegalArgumentException("El campo 'password' no puede ser nulo o vacío");
-        } else if(!password.matches("\\d{8}")) {
+        } else if (!password.matches("\\d{8}")) {
             throw new IllegalArgumentException("Minimo 8 carácteres");
         }
-        
-        this.hashPassword = BCrypt.hashpw("mySecretPassword", BCrypt.gensalt());
+
+        this.hashPassword = BCrypt.hashpw(password, BCrypt.gensalt(6));
     }
 
 }
