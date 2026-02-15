@@ -12,7 +12,7 @@ public class User {
     private static int userCount = 0;
 
     // Atributos no estaticos
-    private final int ID;
+    private final int Id;
     private String username;
     private String email;
     private String hashPassword;
@@ -21,17 +21,25 @@ public class User {
     /* CONSTRUCTOR */
 
     public User(String username, String email, String password) {
-        this.ID = ++userCount;
+        this.Id = ++userCount;
         setUsername(username);
         setEmail(email);
         setPassword(password);
         this.projects = new ArrayList<>();
     }
 
+    public User(User actualUser) {
+        this.Id = actualUser.Id;
+        setUsername(actualUser.email);
+        setEmail(actualUser.email);
+        this.hashPassword = actualUser.hashPassword;
+        this.projects = List.copyOf(actualUser.projects);
+    }
+
     /* GETTERS Y SETTERS */
 
     public int getId() {
-        return ID;
+        return Id;
     }
 
     public String getUsername() {
@@ -130,9 +138,9 @@ public class User {
     }
 
     /**
-     * Obtiene un proyecto por su ID
+     * Obtiene un proyecto por su Id
      * 
-     * @param projectId ID del proyecto
+     * @param projectId Id del proyecto
      * @return El proyecto encontrado o null si no existe
      */
     public Project getProjectById(int projectId) {
@@ -142,18 +150,46 @@ public class User {
                 .orElse(null);
     }
 
+    /**
+     * Obtiene todas las tareas de todos los proyectos del usuario
+     * 
+     * @return Lista con todas las tareas
+     */
+    public List<Task> getAllTasks() {
+        return this.projects.stream()
+                .flatMap(p -> p.getTasks().stream())
+                .toList();
+    }
+
+    /**
+     * Obtiene el progreso global de todos los proyectos
+     * 
+     * @return Porcentaje de progreso promedio (0-100)
+     */
+    public double getGlobalProgress() {
+        if (this.projects.isEmpty()) {
+            return 0;
+        }
+
+        double sum = this.projects.stream()
+                .mapToDouble(Project::getProgress)
+                .sum();
+
+        return sum / this.projects.size();
+    }
+
     /* MÉTODOS AUXILIARES */
     @Override
     public String toString() {
-        return String.format("ID: %d | Username: %s | Email: %s | Projects: %d",
-                this.ID, this.username, this.email, this.projects.size());
+        return String.format("Id: %d | Username: %s | Email: %s | Projects: %d",
+                this.Id, this.username, this.email, this.projects.size());
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ID;
+        result = prime * result + Id;
         return result;
     }
 
@@ -166,8 +202,9 @@ public class User {
         if (getClass() != obj.getClass())
             return false;
         User other = (User) obj;
-        if (ID != other.ID)
+        if (Id != other.Id)
             return false;
         return true;
     }
+
 }
