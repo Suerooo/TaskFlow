@@ -6,42 +6,46 @@ import model.Project;
 import model.Task;
 
 public class ProjectService {
-    private static List<Project> projects;
+    private List<Project> projects;
 
     private ProjectService() {
     }
 
-    public static Project createProject(String name, String description) {
+    public Project createProject(String name, String description) {
         Project project = new Project(name, description);
         projects.add(project);
         return project;
     }
 
-    public static Project searchById(int id) {
+    public Project searchById(int id) {
         return projects.stream().filter(t -> t.getId() == id).findFirst().orElse(null);
     }
 
-    public static boolean removeProject(int id) {
-        return projects.remove(ProjectService.searchById(id));
+    public boolean removeProject(int id) {
+        return projects.remove(searchById(id));
     }
 
-    public static List<Project> getProjects() {
+    public List<Project> getProjects() {
         return List.copyOf(projects);
     }
 
-    public static void addTaskToProject(int projectId, Task task) {
-        ProjectService.searchById(projectId).addTask(task);
+    public void addTaskToProject(int projectId, Task task) {
+        if (task == null)
+            throw new IllegalArgumentException("El campo 'task' no puede ser null");
+        searchById(projectId).addTask(task);
     }
 
-    public static void removeTaskToProject(int projectId, Task task) {
-        ProjectService.searchById(projectId).removeTask(task);
+    public void removeTaskToProject(int projectId, Task task) {
+        if (task == null)
+            throw new IllegalArgumentException("El campo 'task' no puede ser null");
+        searchById(projectId).removeTask(task);
     }
 
-    public static List<Task> getTaskOfProject(int projectId) {
-        return ProjectService.searchById(projectId).getTasks();
+    public List<Task> getTaskOfProject(int projectId) {
+        return searchById(projectId).getTasks();
     }
 
-    public static int getProgressProject(int projectId) {
-        return ProjectService.searchById(projectId).getProgress();
+    public int getProgressProject(int projectId) {
+        return searchById(projectId).getProgress();
     }
 }
