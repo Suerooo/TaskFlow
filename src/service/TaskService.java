@@ -11,39 +11,43 @@ public class TaskService {
     private TaskService() {
     }
 
-    private static List<Task> tasks;
+    private List<Task> tasks;
 
-    public static Task createTask(String title, String description, Priority priority, LocalDate dateDeadline) {
+    public Task createTask(String title, String description, Priority priority, LocalDate dateDeadline) {
         Task task = Task.builder(title).description(description).priority(priority).deadline(dateDeadline).build();
         tasks.add(task);
         return task;
     }
 
-    public static Task searchById(int id) {
+    public Task searchById(int id) {
         return tasks.stream().filter(t -> t.getId() == id).findFirst().orElse(null);
     }
 
-    public static boolean removeTask(int id) {
-        return tasks.remove(TaskService.searchById(id));
+    public boolean removeTask(int id) {
+        return tasks.remove(searchById(id));
     }
 
-    public static void changeState(int id, boolean completed) {
-        TaskService.searchById(id).setCompleted(completed);
+    public void changeState(int id, boolean completed) {
+        searchById(id).setCompleted(completed);
     }
 
-    public static List<Task> filterByState(State state) {
+    public List<Task> filterByState(State state) {
+        if (state == null)
+            throw new IllegalArgumentException("El campo 'state' no puede ser null");
         return tasks.stream().filter(t -> t.getState() == state).toList();
     }
 
-    public static List<Task> filterByPriority(Priority priority) {
+    public List<Task> filterByPriority(Priority priority) {
+        if (priority == null)
+            throw new IllegalArgumentException("El campo 'priority' no puede ser null");
         return tasks.stream().filter(t -> t.getPriority() == priority).toList();
     }
 
-    public static List<Task> getTasks() {
+    public List<Task> getTasks() {
         return List.copyOf(tasks);
     }
 
-    public static List<Task> orderByDate() {
+    public List<Task> orderByDate() {
         Comparator<Task> comparatorDate = (o1, o2) -> o1.getDateDeadline().compareTo(o2.getDateDeadline());
         return tasks.stream().sorted(comparatorDate).toList();
     }
